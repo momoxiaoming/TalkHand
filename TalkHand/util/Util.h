@@ -18,4 +18,11 @@
 
 //字典转字符串
 + (NSString *)jsonStringWithObject:(id)jsonObject;
+
+
+//获取当前时间戳,毫秒数
++(NSString*)getCurrentTimestamp;
+
+//删除沙盒文件
++(bool) deleteDistoryFile:(NSString*)filePath;
 @end

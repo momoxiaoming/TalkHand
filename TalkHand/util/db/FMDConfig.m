@@ -52,7 +52,7 @@
  
     
       //创建消息表
-     NSString * info_sql=@"create table if not exists msgtable(msg_id integer primary key autoincrement,msg_type varchar, msg_content text ,msg_isor varchar ,msg_second varchar,msg_time varchat,otherid varchar,videoUrl varchar)";
+     NSString * info_sql=@"create table if not exists msgtable(msg_id integer primary key autoincrement,msg_type varchar, msg_content text ,msg_isor varchar ,msg_second varchar,msg_time varchat,otherid varchar,videoUrl varchar,lc_voiceUrl varchar)";
     
      //会话列表
      NSString * msgList_sql=@"create table if not exists conversation_table(list_id integer primary key autoincrement,owerId varchar , otherId varchar,readnum varchar,list_time varchar,newmsg blob NOT NULL)";
@@ -290,13 +290,14 @@
     NSString *msg_time=[msg valueForKey:@"msg_time"];
     NSString *otherid=[msg valueForKey:@"otherid"];
     NSString *isread=[msg valueForKey:@"isread"];
-     NSString *videourl=[msg valueForKey:@"videoUrl"];
+    NSString *videourl=[msg valueForKey:@"videoUrl"];
+    NSString *lc_voiceUrl=[msg valueForKey:@"lc_voiceUrl"]==nil?@"":[msg valueForKey:@"lc_voiceUrl"];
        [self.db open];
        [self.db beginTransaction];
   
-        NSString *sql=@"insert into msgtable(msg_type,msg_content,msg_isor,msg_second,msg_time,otherid,videoUrl) values(?,?,?,?,?,?,?)";
+        NSString *sql=@"insert into msgtable(msg_type,msg_content,msg_isor,msg_second,msg_time,otherid,videoUrl,lc_voiceUrl) values(?,?,?,?,?,?,?,?)";
         //注意,填充符里面的都是对象,如果数据是基本类型,要先转为对象
-        [self.db executeUpdate:sql,msg_type,msg_content,msg_isor,msg_second,msg_time,otherid,videourl];
+        [self.db executeUpdate:sql,msg_type,msg_content,msg_isor,msg_second,msg_time,otherid,videourl,lc_voiceUrl];
         [self.db commit];
         [self.db close];
     
@@ -325,7 +326,11 @@
          NSString *msg_time=[resultSet stringForColumn:@"msg_time"];
          NSString *otherid=[resultSet stringForColumn:@"otherid"];
          NSString *msg_content=[resultSet stringForColumn:@"msg_content"];
-            NSString *video_Url=[resultSet stringForColumn:@"videoUrl"];
+        NSString *video_Url=[resultSet stringForColumn:@"videoUrl"];
+        NSString *lc_voiceUrl=[resultSet stringForColumn:@"lc_voiceUrl"];
+        NSString *msg_id=[NSString stringWithFormat:@"%i",[resultSet intForColumn:@"msg_id"]];
+        
+        msg.msg_id=msg_id;
         msg.msg_time=msg_time;
         msg.msg_isor=msg_isor;
         msg.msg_second=msg_second;
@@ -333,7 +338,7 @@
         msg.otherid=otherid;
         msg.msg_info_type=msg_type;
         msg.videoUrl=video_Url;
-        
+        msg.lc_voiceUrl=lc_voiceUrl;
         
         [arr addObject:msg];
     }
@@ -346,5 +351,22 @@
     
     return arr;
 }
+-(void)updateMessage:(BaseMsg *)basemsg{
+//    NSInteger msg_id=[basemsg.msg_id integerValue];
+    NSString *voiceUrl=basemsg.lc_voiceUrl;
+    [self.db open];
+    [self.db beginTransaction];
+    
+     NSString *sql=@"update msgtable set lc_voiceUrl=? where msg_id=?";
+    //注意,填充符里面的都是对象,如果数据是基本类型,要先转为对象
+    [self.db executeUpdate:sql,voiceUrl,basemsg.msg_id];
+//    self.db ex
 
+    [self.db commit];
+    [self.db close];
+    
+    
+    
+
+}
 @end

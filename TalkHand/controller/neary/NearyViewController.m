@@ -370,6 +370,10 @@
 
 -(void)gz_action:(UIButton*)sender{
         NSLog(@"关注-->%@",sender);
+    NSString *btn_title=sender.titleLabel.text;
+    if([btn_title isEqualToString:@"已关注"]){
+        return;
+    }
     
     NSInteger index= sender.tag;
     NSString *acount= self.neary_data[index][@"id"];

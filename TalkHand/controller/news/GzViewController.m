@@ -9,6 +9,7 @@
 #import "GzViewController.h"
 #import "GzCell.h"
 #import "AFHttpSessionClient.h"
+#import "NearyinfoViewController.h"
 @interface GzViewController ()
 @property (weak, nonatomic) IBOutlet UIView *left_view;
 @property (weak, nonatomic) IBOutlet UIView *right_view;
@@ -20,6 +21,7 @@
 
 @property NSMutableArray *view_data;
 
+@property NSString *type;
 
 
 @end
@@ -36,7 +38,7 @@
 }
 -(void)viewWillAppear:(BOOL)animated{
 
-    [self getViewData:@"1"];
+    
 }
 -(void)viewWillDisappear:(BOOL)animated{
       [MBProgressHUD hideHUDForView:self.view animated:YES];
@@ -49,15 +51,73 @@
     self.tableview.separatorInset=UIEdgeInsetsMake(0, 66, 0, 10);//设置分割线缩进
     [self selectView:@"1"];
     
+    self.type=@"1";
     
     [self setListener:self.right_view index:2];
     [self setListener:self.left_view index:1];
  
     
     self.view_data=[[NSMutableArray alloc]init];
+    [self getViewData:@"1"];
+}
+
+-(void)cellClick:(NSInteger)tag isright:(NSInteger)isright object:(NSObject *)obj{
+    if(tag==1){
+    UIAlertController *alert=[UIAlertController alertControllerWithTitle:@"提示" message:@"取消关注可能会让你无法直接找到该好友,是否继续取消?" preferredStyle:UIAlertControllerStyleAlert];
+    
+    UIAlertAction *action=[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:nil];
+    UIAlertAction *action2=[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+          //取消关注,刷新列表
+        [self QxGzData:[obj valueForKey:@"account"]];
+    }];
+    
+    [alert addAction:action];
+    [alert addAction:action2];
+    
+    
+    [self presentViewController:alert animated:YES completion:nil];
+    }else if(tag==2){
+        NearyinfoViewController *con=[[NearyinfoViewController alloc]init];
+        con.owerid=[obj valueForKey:@"account"];
+        [self goNextController:con];
+    }
 }
 
 
+//取消关注
+-(void)QxGzData:(NSString *)type{
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+    AFHttpSessionClient *af=[AFHttpSessionClient sharedClient];
+    NSMutableDictionary *req=[[NSMutableDictionary alloc]init];
+    [req setObject:[[NSUserDefaults standardUserDefaults] objectForKey:@"id"] forKey:@"id"];
+    [req setObject:type forKey:@"otherID"];
+    
+    [af post:qxgz_url parameters:req actionBlock:^(NSDictionary *posts, NSError *error) {
+        NSLog(@"%@",posts);
+        NSInteger state=[posts[@"state"] integerValue];;
+        [MBProgressHUD hideHUDForView:self.view animated:YES];
+        if(state==1){
+            
+            [self getViewData:self.type];
+            
+            
+            
+//            
+//            [self.view_data setArray:posts[@"data"]];
+//            [self.tableview reloadData];
+            
+        }
+        
+        
+        
+        
+        
+        
+    }];
+    
+    
+    
+}
 
 -(void)getViewData:(NSString *)type{
     [MBProgressHUD showHUDAddedTo:self.view animated:YES];
@@ -70,19 +130,19 @@
         NSLog(@"%@",posts);
         
         NSInteger state=[posts[@"state"] integerValue];;
-        
-        if(state==1){
             [MBProgressHUD hideHUDForView:self.view animated:YES];
+        if(state==1){
+        
+            
+            
+            
+            
             [self.view_data setArray:posts[@"data"]];
             [self.tableview reloadData];
             
         }
         
-        
-        
-        
-        
-        
+      
     }];
     
 
@@ -110,9 +170,11 @@
     if(index==1){
         [self selectView:@"1"];
         [self getViewData:@"1"];
+        self.type=@"1";
     }else{
         [self selectView:@"2"];
         [self getViewData:@"2"];
+        self.type=@"2";
 
     }
     
@@ -158,15 +220,18 @@
 -(UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath{
      GzCell *item=  [GzCell tgcellWithTableView:tableView];
     [item setItemData:_view_data[indexPath.row] type:@"gz"];
-    
+    [item setGzdelete:self];
     return item;
 }
 
--(void)tableView:(UITableView *)tableView didDeselectRowAtIndexPath:(NSIndexPath *)indexPath{
 
-
-
+-(void)tableView:(UITableView *)tableView didSelectRowAtIndexPath:(NSIndexPath *)indexPath{
+    
+    
+  
 }
+
+
 - (void)didReceiveMemoryWarning {
     [super didReceiveMemoryWarning];
     // Dispose of any resources that can be recreated.

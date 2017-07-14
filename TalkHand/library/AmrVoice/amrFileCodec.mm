@@ -336,6 +336,7 @@ int DecodeAMRFileToWAVEFile(const char* pchAMRFileName, const char* pchWAVEFilen
 	
 	// 检查amr文件头
 	fread(magic, sizeof(char), strlen(AMR_MAGIC_NUMBER), fpamr);
+    
 	if (strncmp(magic, AMR_MAGIC_NUMBER, strlen(AMR_MAGIC_NUMBER)))
 	{
 		fclose(fpamr);

@@ -10,4 +10,7 @@
 
 @interface NotifictionManager : NSObject
 
+
++(instancetype)sharpManager;
+-(void)addNotification:(NSString *)body title:(NSString *)title;
 @end

@@ -74,7 +74,7 @@
     } 
     self.age.text=[NSString stringWithFormat:@"%@岁",age];
     
-    NSInteger isvip=[[obj valueForKey:@"isvip"] integerValue];;
+    NSInteger isvip=[[obj valueForKey:@"isVip"] integerValue];;
     if(isvip==0){
         [self.vipimg setHidden:YES];
 //        [self.lv_view setHidden:YES];

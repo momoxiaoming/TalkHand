@@ -33,12 +33,12 @@
     return 1;
 }
 
-//获取录音设置
+//获取录音设置,哈哈,这里真的是好地方
 + (NSDictionary*)GetAudioRecorderSettingDict{
     NSDictionary *recordSetting = [[NSDictionary alloc] initWithObjectsAndKeys:
                                    [NSNumber numberWithFloat: 8000.0],AVSampleRateKey, //采样率
                                    [NSNumber numberWithInt: kAudioFormatLinearPCM],AVFormatIDKey,
-                                   [NSNumber numberWithInt:16],AVLinearPCMBitDepthKey,//采样位数 默认 16
+                                   [NSNumber numberWithInt:16],AVLinearPCMBitDepthKey,//采样  
                                    [NSNumber numberWithInt: 1], AVNumberOfChannelsKey,//通道的数目
                                    //[NSNumber numberWithBool:NO],AVLinearPCMIsBigEndianKey,//大端还是小端 是内存的组织方式
                                    //[NSNumber numberWithBool:NO],AVLinearPCMIsFloatKey,//采样信号是整数还是浮点数

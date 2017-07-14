@@ -12,7 +12,7 @@
 #import "FMDConfig.h"
 #import "ConfigEntity.h"
 #import "LocalUDPDataSender.h"
-
+#import "IMClientManager.h"
 @interface WelcomControllerViewController ()
 
 @end
@@ -33,35 +33,44 @@
     NSLog(@"viewDidLoad");
     // Do any additional setup after loading the view.
     
-    
-    
-    
-    
-    UIImageView *bg=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
-    bg.image=[UIImage imageNamed:@"icon_qdym"];
-    [self.view addSubview:bg];
+   [[IMClientManager sharedInstance] initMobileIMSDK]; //初始化聊天
+    bool isInit=false;
+    while(!isInit){
+      isInit  =[IMClientManager sharedInstance].isinit;
+    }
 
-    NSUserDefaults * defa=[NSUserDefaults standardUserDefaults];
-    NSString * name=[defa valueForKey:@"id"];
-    NSString * pwd=[defa valueForKey:@"password"];
-    if(name!=NULL&&pwd!=NULL){
-        NSLog(@"name-->%@--pwd--%@",name,pwd);
+    
+    if(isInit){
+        UIImageView *bg=[[UIImageView alloc] initWithFrame:CGRectMake(0, 0, SCREEN_WIDTH, SCREEN_HEIGHT)];
+        bg.image=[UIImage imageNamed:@"icon_qdym"];
+        [self.view addSubview:bg];
         
-        [self getUserinfo];
-        
-        int code= [self login:name pwd:pwd];
-        if(code==0){
+        NSUserDefaults * defa=[NSUserDefaults standardUserDefaults];
+        NSString * name=[defa valueForKey:@"id"];
+        NSString * pwd=[defa valueForKey:@"password"];
+        if(name!=NULL&&pwd!=NULL){
+            NSLog(@"name-->%@--pwd--%@",name,pwd);
+            
+            [self getUserinfo];
+            int code=1;
+            int num=0;
+            while (code!=0&&num<5) {
+                num++;
+                code= [self login:name pwd:pwd];
+            }
+            
+            
+            
             MainTabBarController * tab=[[MainTabBarController alloc]init];
             //切换根视图
             UIApplication.sharedApplication.delegate.window.rootViewController=tab;
+            
+        }else{
+            [self moreData];
+            [self getUserinfo];
         }
-//        MainTabBarController * tab=[[MainTabBarController alloc]init];
-//        //切换根视图
-//        UIApplication.sharedApplication.delegate.window.rootViewController=tab;
-    }else{
-        [self moreData];
-        [self getUserinfo];
     }
+    
  
 }
 

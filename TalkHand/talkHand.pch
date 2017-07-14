@@ -11,5 +11,51 @@
 
 // Include any system framework and library headers here that should be included in all compilation units.
 // You will also need to set the Prefix Header build setting of one or more of your targets to reference this file.
+#import <UIKit/UIKit.h>
+#import <Foundation/Foundation.h>
+
+#import "Constant.h"
+
+#import <AFNetworking.h>
+#import <MJExtension.h>
+
+#import "BaseViewController.h"
+#import "SeleView.h"
+
+#import "UIImageView+WebCache.h"
+
+#import "UIColor+Hex.h"
+//加载布局框架
+#import "Masonry.h"
+
+#import "IQKeyboardManager.h"
+
+#import "Toast.h"
+
+#import "NSBundle+YYAdd.h"
+
+//进度条弹出框架
+#import <MBProgressHUD.h>
+
+#define SCREEN_WIDTH ([UIScreen mainScreen].bounds.size.width)
+#define SCREEN_HEIGHT ([UIScreen mainScreen].bounds.size.height)
+
+
+#import "FMDConfig.h"
+
+
+#import "Util.h"   //工具类
+
+
+
+
+#import "NSAttributedString+YYText.h"
+
+//#import "UIView+YYAdd.h"
+
+// NSLocalizedString(key, comment) 本质
+// NSlocalizeString 第一个参数是内容,根据第一个参数去对应语言的文件中取对应的字符串，第二个参数将会转化为字符串文件里的注释，可以传nil，也可以传空字符串@""。
+#define NSLocalizedString(key, comment) [[NSBundle mainBundle] localizedStringForKey:(key) value:@"" table:nil]
+
 
 #endif /* talkHand_pch */

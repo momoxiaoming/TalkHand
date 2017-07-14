@@ -32,11 +32,11 @@
         //获取QQ表情解析格式
         
         /** 使用旧版QQ表情 */
-        self.qqBundle = [NSBundle bundleWithPath:[kXMNChatBundle pathForResource:@"QQIcon" ofType:@"bundle"]];
+//        self.qqBundle = [NSBundle bundleWithPath:[kXMNChatBundle pathForResource:@"QQIcon" ofType:@"bundle"]];
         
         /** 使用最新版QQ表情 */
-        self.qqBundle = [NSBundle bundleWithPath:[kXMNChatBundle pathForResource:@"QQIconNew" ofType:@"bundle"]];
-
+ 
+       self.qqBundle = [NSBundle bundleWithPath:[[NSBundle mainBundle] pathForResource:@"QQIconNew" ofType:@"bundle"]];
         self.qqEmotions =  [NSArray arrayWithContentsOfFile:[self.qqBundle pathForResource:@"info" ofType:@"plist"]];
         NSMutableDictionary *mapper = [NSMutableDictionary dictionary];
         NSMutableDictionary *gifMapper = [NSMutableDictionary dictionary];

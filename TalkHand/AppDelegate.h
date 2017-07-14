@@ -1,8 +1,8 @@
 //
 //  AppDelegate.h
-//  TalkHand
+//  QsQ
 //
-//  Created by 张小明 on 2017/7/7.
+//  Created by 张小明 on 2017/3/24.
 //  Copyright © 2017年 张小明. All rights reserved.
 //
 

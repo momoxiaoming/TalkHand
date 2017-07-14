@@ -26,8 +26,7 @@
 
 @interface IMClientManager ()
 
-/* MobileIMSDK是否已被初始化. true表示已初化完成，否则未初始化. */
-@property (nonatomic) BOOL _init;
+
 //
 //
 
@@ -71,13 +70,13 @@ static IMClientManager *instance = nil;
 
 - (void)initMobileIMSDK
 {
-    if(!self._init)
+    if(!self.isinit)
     {
         // 设置AppKey
         [ConfigEntity registerWithAppKey:@"e9c7a90c1143c1ba9c"];
         
         // 设置服务器ip和服务器端口
-        [ConfigEntity setServerIp:@"192.168.1.123"];
+        [ConfigEntity setServerIp:@"192.168.1.77"];
         [ConfigEntity setServerPort:7901];
         // 开启DEBUG信息输出
         [ClientCoreSDK setENABLED_DEBUG:YES];
@@ -91,7 +90,7 @@ static IMClientManager *instance = nil;
         
        
         
-        self._init = YES;
+        self.isinit = YES;
     }
 }
 

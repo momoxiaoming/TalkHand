@@ -7,7 +7,7 @@
 //
 
 #import <UIKit/UIKit.h>
-
+#import "CellitemClickDelete.h"
 @interface GzCell : UITableViewCell
 @property (weak, nonatomic) IBOutlet UIImageView *tx_img;
 @property (weak, nonatomic) IBOutlet UILabel *name;
@@ -18,6 +18,12 @@
 @property (weak, nonatomic) IBOutlet UIImageView *sex_img;
 @property (weak, nonatomic) IBOutlet UIImageView *gz_img;
 @property (weak, nonatomic) IBOutlet UILabel *gz_txt;
+
+@property NSDictionary *itemData;
+
 +(instancetype)tgcellWithTableView:(UITableView *)tableview;
 -(void)setItemData:(NSDictionary*)itemdata type:(NSString*)fk;
+
+@property id<CellitemClickDelete> gzdelete;
+
 @end

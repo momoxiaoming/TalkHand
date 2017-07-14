@@ -12,6 +12,9 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"http://qs.mgonb.com:9901
 //static NSString * const AFAppDotNetAPIBaseURLString = @"http://192.168.1.123:8082/mkfrd-web/";
 //static NSString * const AFAppDotNetAPIBaseURLString = @"http://192.168.1.77:8082/mkfrd-web/";
 @implementation AFHttpSessionClient
+
+
+
 +(instancetype)sharedClient{
 
     static AFHttpSessionClient *_sharedClient = nil;
@@ -146,7 +149,6 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"http://qs.mgonb.com:9901
         NSData *jsonData = [res dataUsingEncoding:NSUTF8StringEncoding];   //再将解密后的字符串转为nsdata,方便转为字典
         NSDictionary * dict=[NSJSONSerialization JSONObjectWithData:jsonData options:NSJSONReadingAllowFragments error:nil];  //将结果转为地点数据
         
-        
         if (block) {
             block(dict, nil);
         }
@@ -196,7 +198,7 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"http://qs.mgonb.com:9901
     NSMutableURLRequest *req = [[AFJSONRequestSerializer serializer] requestWithMethod:@"POST" URLString:url parameters: nil error:nil];
     
     //设置请求头,并设置body参数
-    req.timeoutInterval= [[[NSUserDefaults standardUserDefaults] valueForKey:@"timeoutInterval"] longValue];
+    req.timeoutInterval= 5;
     
     [req setHTTPBody:prepram];
     
@@ -243,7 +245,13 @@ static NSString * const AFAppDotNetAPIBaseURLString = @"http://qs.mgonb.com:9901
         /* 下载路径 */
       NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
         
-        NSString *filePath = [path stringByAppendingPathComponent:url.lastPathComponent];
+        NSString *filename=url.lastPathComponent;
+        
+        NSString *filePath = [path stringByAppendingPathComponent:filename];
+        
+        
+        
+        
         
         return [NSURL fileURLWithPath:filePath];
         

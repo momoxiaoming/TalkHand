@@ -59,4 +59,29 @@
         return nil;
     }
 }
+
+
++(NSString*)getCurrentTimestamp{
+    
+    NSDate* dat = [NSDate dateWithTimeIntervalSinceNow:0];
+    
+    NSTimeInterval a=[dat timeIntervalSince1970] *1000;
+    
+    NSString*timeString = [NSString stringWithFormat:@"%0.f", a];//转为字符型
+    
+    return timeString;
+    
+}
+
+
++(bool)deleteDistoryFile:(NSString *)filePath{
+    NSFileManager *manager=[[NSFileManager alloc]init];
+    
+    if( [manager fileExistsAtPath:filePath]){  //如果文件存在就删除
+     return  [manager removeItemAtPath:filePath error:nil];
+    }
+    return false;
+    
+
+}
 @end

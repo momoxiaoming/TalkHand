@@ -1,3 +1,4 @@
+
 //
 //  SearchVideoView.m
 //  TalkHand
@@ -9,6 +10,43 @@
 #import "SearchVideoView.h"
 
 @implementation SearchVideoView
+
+
+
+
+//-(instancetype)initWithFrame:(CGRect)frame{
+//    self=[super initWithFrame:frame];
+//    if(self){
+//    
+//    }
+//    return self;
+//}
+//
+//
+//
+//-(void)createView{
+//    UIImageView * tx_img=[[UIImageView alloc]init];
+//    tx_img.layer.cornerRadius=25;
+//    tx_img.layer.masksToBounds=YES;
+//    for(int i=1;i<5;i++){
+//       
+//    
+//    }
+//    UIView *lin_1=[[UIView alloc]init];
+//    lin_1.layer.cornerRadius=
+//    tx_img.layer.masksToBounds=5;
+//    
+//    
+//    
+//    
+//    
+//
+//
+//}
+
+
+
+
 
 /*
 // Only override drawRect: if you perform custom drawing.

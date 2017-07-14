@@ -19,7 +19,8 @@
 #import "BaseMsgEvent.h"
 
 @interface IMClientManager : NSObject
-
+/* MobileIMSDK是否已被初始化. true表示已初化完成，否则未初始化. */
+@property (nonatomic) BOOL isinit;
 /*!
  * 取得本类实例的唯一公开方法。
  * <p>

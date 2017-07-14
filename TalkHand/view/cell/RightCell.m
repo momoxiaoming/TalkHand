@@ -117,7 +117,8 @@
         
         
         _ImageView=[[UIImageView alloc]init];
-        _ImageView.contentMode=UIViewContentModeRedraw;
+       
+        _ImageView.contentMode=UIStackViewAlignmentFill;
         [self.content_View addSubview:_ImageView];
         //设置约束为内容view的边界
         [_ImageView mas_makeConstraints:^(MASConstraintMaker *make) {
@@ -171,10 +172,10 @@
         
         
         CGFloat wd=0;
-        if(scoen<3){
+        if(scoen<=5){
             wd=50;
             
-        }else if(scoen>3&&scoen<8){
+        }else if(scoen>5&&scoen<=8){
             wd=100;
         }else if(scoen>8&&scoen<15){
             wd=150;
@@ -365,14 +366,29 @@
     }
     
     
-    
-    //更新约束
-    [self.content_View mas_updateConstraints:^(MASConstraintMaker *make) {
-//        make.top.equalTo(self.Tx_img).offset(0);
-//        make.right.equalTo(_Tx_img.mas_right).offset(-15);
+    [self.content_View mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.top.equalTo(self.Tx_img).offset(5);
+//        make.right.equalTo(_Tx_img.mas_left).offset(-20);
+        
+//        make.height.lessThanOrEqualTo(@30);
         make.size.mas_equalTo(CGSizeMake(wd, hg));
-
+//        make.bottom.equalTo(self.contentView).offset(-15);
     }];
+    
+    
+    
+//    [self.msg_bg_img mas_makeConstraints:^(MASConstraintMaker *make) {
+//        
+//        make.top.equalTo(self.content_View).offset(-5);
+//        make.left.equalTo(self.content_View).offset(-5);
+//        make.right.equalTo(self.content_View).offset(10);
+//        make.bottom.equalTo(self.content_View).offset(5);
+//        
+//        
+//    }];
+    
+    
+  
     
     // 通知需要更新约束，但是不立即执行
     [self setNeedsUpdateConstraints];
@@ -380,7 +396,7 @@
     // update constraints now so we can animate the change
     [self updateConstraintsIfNeeded];
     
-    
+    [self setNeedsLayout];
 
     
     

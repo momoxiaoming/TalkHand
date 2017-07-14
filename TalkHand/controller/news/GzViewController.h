@@ -7,7 +7,7 @@
 //
 
 #import "BaseViewController.h"
-
-@interface GzViewController : BaseViewController<UITableViewDelegate,UITableViewDataSource>
+#import "CellitemClickDelete.h"
+@interface GzViewController : BaseViewController<UITableViewDelegate,UITableViewDataSource,CellitemClickDelete>
 
 @end

@@ -7,16 +7,17 @@
 //
 
 #import "VideoViewController.h"
-#import "FingerWaveView.h"
 #import "SxViewController.h"
 #import "AFHttpSessionClient.h"
 #import "PipViewController.h"
+#import "SearchView.h"
 @interface VideoViewController ()
-@property FingerWaveView * findview;
 @property UILabel * pp_btn;
 @property NSMutableDictionary *sx_dri;
 @property NSMutableDictionary *send_data;
 @property UILabel *num;
+@property SearchView *search;
+@property NSDictionary *finUser;
 @end
 
 @implementation VideoViewController
@@ -30,6 +31,8 @@
     
 }
 
+
+
 -(void)viewWillAppear:(BOOL)animated{
     
     [self.navigationController.navigationBar setHidden:YES];
@@ -37,10 +40,20 @@
     [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sx_aciton:) name:@"sx_data" object:nil];
     
     if(_num!=NULL){
-        NSInteger index = arc4random() % (5000)+2000;
+        NSInteger index = arc4random() % (3000)+2000;
         _num.text=[NSString stringWithFormat:@"%lu",index];
     
     }
+    
+    if(_search!=NULL){
+        [_search stopHh];
+        [_pp_btn setBackgroundColor:[UIColor colorWithHexString:@"0BE6FF"]];
+//        [[Toast makeText:@"匹配失败,请重试!"]showWithType:ShortTime];
+//        [_search stopHh];
+        [_pp_btn setEnabled:true];
+        [_pp_btn setText:@"开始匹配"];
+    }
+    
     
     
 }
@@ -130,13 +143,18 @@
         make.size.mas_equalTo(self.view);
     }];
 
-    _findview=[[FingerWaveView alloc]init];
-//    _findview.backgroundColor=[UIColor redColor];
-      [self.view addSubview:_findview];
-    [_findview mas_makeConstraints:^(MASConstraintMaker *make) {
-        make.center.equalTo(self.view);
-//        make.centerX.equalTo(self.view);
-    }];
+    
+    
+    _search=[[SearchView alloc]initWithFrame:CGRectMake(0, self.view.center.y-SCREEN_WIDTH/2, SCREEN_WIDTH, SCREEN_WIDTH)];
+    
+    [self.view addSubview:_search];
+//    _findview=[[FingerWaveView alloc]init];
+////    _findview.backgroundColor=[UIColor redColor];
+//      [self.view addSubview:_findview];
+//    [_findview mas_makeConstraints:^(MASConstraintMaker *make) {
+//        make.center.equalTo(self.view);
+////        make.centerX.equalTo(self.view);
+//    }];
     
     _pp_btn=[[UILabel alloc]init];
     _pp_btn.text=@"开始匹配";
@@ -183,6 +201,10 @@
     UITapGestureRecognizer *tableViewGesture2 = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(sx_action)];
     sx_view.userInteractionEnabled=YES;
     [sx_view addGestureRecognizer:tableViewGesture2];
+    
+    
+    
+    
 
 }
 -(void)sx_action{
@@ -204,13 +226,59 @@
     }];
 }
 -(void)commentTableViewTouchInSide{
-    [_pp_btn setText:@"正在匹配.."];
-    [self position];
-    [self.findview tx_springAni];
-
+    NSString *txt=_pp_btn.text;
+    if([txt isEqualToString:@"开始匹配"]){
+         [_pp_btn setBackgroundColor:[UIColor grayColor]];
+        [_pp_btn setText:@"正在匹配.."];
+        [_pp_btn setEnabled:false];
+        [_search hidenAllUserView];
+        
+        
+       NSInteger count= arc4random()%4+4;
+        
+        
+        [_search startHh:count dict:1];
+        [self sendData];
+        
+        dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(count * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+            
+            
+            if(self.finUser!=NULL){
+                [_pp_btn setText:@"匹配完成.."];
+                [_search showUser];
+                [_pp_btn setEnabled:true];
+                
+                dispatch_after(dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2 * NSEC_PER_SEC)), dispatch_get_main_queue(), ^{
+                    PipViewController * pip=[[PipViewController alloc]init];
+                    pip.acount=self.finUser[@"account"];
+                    [self goNextController:pip];
+                });
+                
+                
+            
+            }else{
+             [_pp_btn setBackgroundColor:[UIColor colorWithHexString:@"0BE6FF"]];
+             [[Toast makeText:@"匹配失败,请重试!"]showWithType:ShortTime];
+             [_search stopHh];
+             [_pp_btn setEnabled:true];
+             [_pp_btn setText:@"开始匹配"];
+            
+            }
+           
+        });
+    }else{
+        [[Toast makeText:@"正在匹配中.."]showWithType:ShortTime];
+        return;
+    }
     
-    [self sendData];
+   
+//    [self position];
+//    [self.findview tx_springAni];
+//
+//    
+//    [self sendData];
  
+    
     
     
     
@@ -233,69 +301,28 @@
         [_send_data setObject:acount forKey:@"id"];
         [_send_data setObject:@""forKeyedSubscript:@"address"];
     }
-    
-    
-  
- 
-    
-    
 
-   
     [as post:getvideo_url parameters:_send_data actionBlock:^(NSDictionary *posts, NSError *error) {
         NSLog(@"%@",posts);
-        [self.pp_btn setText:@"匹配成功"];
+    
         NSInteger state=[posts[@"state"]integerValue];
         if(state==1){
             NSArray * userData=posts[@"data"];
-                 [self.findview showUser:userData];
+            
+        
             
             NSInteger index = arc4random() % (userData.count);
-            
-          NSDictionary * dir=  [userData objectAtIndex:index] ;
+            NSDictionary * dir=  [userData objectAtIndex:index];
          
-            dispatch_time_t delayTime = dispatch_time(DISPATCH_TIME_NOW, (int64_t)(2.0 * NSEC_PER_SEC));
-            dispatch_after(delayTime, dispatch_get_main_queue(), ^{
-                PipViewController * pip=[[PipViewController alloc]init];
-                pip.acount=dir[@"account"];
-                [self goNextController:pip];
-            });
-            
-           
-            
-            
+            self.finUser=dir;
+                [self.search setUserImgUrl:userData];
         }
         
    
     }];
 }
 
-- (void)position {
-    CABasicAnimation * ani = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    ani.toValue =[NSNumber numberWithFloat:0.6];
-    ani.removedOnCompletion = NO;
-    ani.fillMode = kCAFillModeForwards;
-    ani.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    
-    CABasicAnimation * ani2 = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    ani2.toValue =[NSNumber numberWithFloat:1];
-    ani2.removedOnCompletion = NO;
-    ani2.fillMode = kCAFillModeForwards;
-    ani2.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    
-    CABasicAnimation * ani3 = [CABasicAnimation animationWithKeyPath:@"transform.scale"];
-    ani3.toValue =[NSNumber numberWithFloat:1.8];
-    ani3.removedOnCompletion = NO;
-    ani3.fillMode = kCAFillModeForwards;
-    ani3.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    
-    CAAnimationGroup * groupAni = [CAAnimationGroup animation];
-    groupAni.animations = @[ani, ani2,ani3,ani2];
-    groupAni.duration = 2.0;
-    groupAni.fillMode = kCAFillModeForwards;
-    groupAni.removedOnCompletion = NO;
-    groupAni.timingFunction = [CAMediaTimingFunction functionWithName:kCAMediaTimingFunctionEaseInEaseOut];
-    [self.findview.layer addAnimation:groupAni forKey:@"groupAni"];
-}
+
 
 
 

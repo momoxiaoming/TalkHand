@@ -146,8 +146,12 @@ dispatch_semaphore_signal(_lock);
         NSString *subStr = [text.string substringWithRange:oneRange];
         UIImage *emoticon = mapper[subStr];
         if (!emoticon) continue;
+        
+        NSMutableAttributedString *atr = [NSMutableAttributedString yy_attachmentStringWithEmojiImage:emoticon fontSize:14.0f];
+        
+        
         /** 使用了自定义的添加表情的解析 */
-        NSMutableAttributedString *atr = [NSMutableAttributedString yy_attachmentStringWithEmojiImage:emoticon attachmentSize:self.emotionSize alignToFont:self.alignFont alignment:self.alignment];
+//        NSMutableAttributedString *atr = [NSMutableAttributedString yy_attachmentStringWithEmojiImage:emoticon attachmentSize:self.emotionSize alignToFont:self.alignFont alignment:self.alignment];
         [atr yy_setTextBackedString:[YYTextBackedString stringWithString:subStr] range:NSMakeRange(0, atr.length)];
         [text replaceCharactersInRange:oneRange withString:atr.string];
         [text yy_removeDiscontinuousAttributesInRange:NSMakeRange(oneRange.location, atr.length)];

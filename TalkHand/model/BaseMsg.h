@@ -36,4 +36,7 @@
 //视频地址
 @property (nonatomic,copy)NSString * videoUrl;
 
+//语音本地地址
+@property (nonatomic,copy)NSString * lc_voiceUrl;
+
 @end

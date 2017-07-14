@@ -8,12 +8,14 @@
 
 #import "BaseMsgEvent.h"
 #import "BaseMsg.h"
+#import "NotifictionManager.h"
 @implementation BaseMsgEvent
 
 //登陆回调通知
 -(void)onLinkCloseMessage:(int)dwErrorCode{
   NSLog(@"网络连断开了，error：%d", dwErrorCode);
 }
+
 -(void)onLoginMessage:(int)dwUserId withErrorCode:(int)dwErrorCode{
     if (dwErrorCode == 0)
         NSLog(@"登录成功，当前分配的user_id=%d！", dwUserId);
@@ -24,7 +26,7 @@
 
 //实时消息
 -(void)onErrorResponse:(int)errorCode withErrorMsg:(NSString *)errorMsg{
-      NSLog(@"收到服务端错误消息，errorCode=%d, errorMsg=%@", errorCode, errorMsg);
+//      NSLog(@"收到服务端错误消息，errorCode=%d, errorMsg=%@", errorCode, errorMsg);
 }
 
 -(void)onTransBuffer:(NSString *)fingerPrintOfProtocal withUserId:(int)dwUserid andContent:(NSString *)dataContent{
@@ -44,6 +46,27 @@
     msg.videoUrl=dict[@"videoUrl"];
     
     [[FMDConfig sharedInstance]saveMessageWithOtherId:msg];
+    
+    
+    NSString *content=@"";
+    if([msg.msg_info_type integerValue]==[textMsg integerValue]){ //文本消息
+        content=msg.msg_content;
+    }else if([msg.msg_info_type integerValue]==[aduioMsg integerValue]){
+        content=@"[语音消息]";
+        
+    }else if([msg.msg_info_type integerValue]==[videoMsg integerValue]){
+        content=@"[视频消息]";
+        
+    }else if([msg.msg_info_type integerValue]==[picterMsg integerValue]){
+        content=@"[图片消息]";
+        
+    }
+    
+    
+    NSLog(@"本地消息通知");
+    
+    [[NotifictionManager sharpManager] addNotification:content title:@"您的好友给你发了新的消息"];
+  
     
     
 //    [[NSNotificationCenter defaultCenter] postNotificationName:@"msg" object:msg];

@@ -19,6 +19,10 @@
 @property  long long startTime;
 @property  long long  endTime;
 
+@property (nonatomic,strong) NSString * _Nullable recv_path;//当前录音的地址
+
+
+
 + (Voice *_Nullable)sharedInstance;
 
 /*
@@ -32,9 +36,9 @@
 
 /*
 *    停止录音和播放
-*
+*    返回当前的录音地址
 */
-- (void)Stop;
+- (NSString*)Stop;
 
 /*
 *    播放录音

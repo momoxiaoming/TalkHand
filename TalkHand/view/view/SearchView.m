@@ -21,21 +21,26 @@
     if(self ){
         [self ceateView];
         self.userArr=[[NSMutableArray alloc]init];
+        _findUserArr=[[NSMutableArray alloc]init];
+         [self addUserView];
        
     }
     return self;
 }
+
 -(void)ceateView{
    
+    
+    
     for (CGFloat i=1; i<=5; i++) {
          CGFloat sx=1.5; //缩小系数
         
          CAShapeLayer *sp=[[CAShapeLayer alloc]init];
-         UIColor *clo=[UIColor colorWithHexString:@"#ffffff" alpha:0.4*((5-i)/5)>0.1?0.4*((5-i)/5):0.1];
+         UIColor *clo=[UIColor colorWithHexString:@"#ffffff" alpha:0.3*((5-i)/5)>0.05?0.3*((5-i)/5):0.05];
          sp.backgroundColor=clo.CGColor;
          sp.position=CGPointMake(self.bounds.size.width/2, self.bounds.size.width/2);
         if(i==1){
-        sp.bounds=CGRectMake(0, 0, self.bounds.size.width*(i/5), self.bounds.size.width*(i/5));
+         sp.bounds=CGRectMake(0, 0, self.bounds.size.width*(i/5), self.bounds.size.width*(i/5));
             sp.masksToBounds=YES;
             sp.cornerRadius=self.bounds.size.width*(i/5)/2;
         }else{
@@ -46,12 +51,13 @@
         
         
         
+        
         int j=(int)i;
         
         switch (j) {
             case 1:
                 self.layer1=sp;
-                self.layer1.contents=(__bridge id _Nullable)([UIImage imageNamed:@"icon_nan"].CGImage);
+              
                 [self.layer addSublayer:self.layer1];
                 break;
             case 2:
@@ -75,7 +81,60 @@
         }
     }
     
+    
+    
+//创建最中间的的用户头像
+    CGFloat x=self.bounds.size.width/2.f;
+    CGFloat y=self.bounds.size.width/2.f;
+    CGFloat w=self.bounds.size.width*0.14;
+    CGFloat h=self.bounds.size.width*0.14;
+    
+    
+   UIImageView* ig=[[UIImageView alloc]init];
+    ig.image=[UIImage imageNamed:@"icon_mor"];
+    
+   
+    
+    ig.center=CGPointMake(x, y);
+    ig.bounds=CGRectMake(0, 0, w, h);
+   
+     [self addSubview:ig];
+
+    
+    NSString *userid=[[NSUserDefaults standardUserDefaults] valueForKey:@"id"];
+    NSDictionary *user_data=  [[FMDConfig sharedInstance] getUserInfoWithId:userid];
+    NSString *url=[user_data valueForKey:@"iconUrl"];
+    
+
+    if(url==NULL){
+        ig.image=[UIImage imageNamed:@"icon_mor"];
+    }else{
+        [ig sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"icon_mor"]];
+    }
+    
+    
+    ig.layer.masksToBounds=YES;
+    ig.layer.cornerRadius=self.bounds.size.width*0.14/2;
+    
+
+   
+    
  
+}
+
+
+-(void)setUserInfo{
+
+
+
+}
+
+-(void)hidenAllUserView{
+  
+    [self.userArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+        UIImageView *objImg=obj;
+        [objImg setHidden:YES];
+    }];
 }
 
 
@@ -206,12 +265,9 @@
     [self.userArr addObject:img10];
 
     
-    [self.userArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-        UIImageView *objImg=obj;
-        [objImg setHidden:YES];
-    }];
+ 
     
-    
+    [self hidenAllUserView];
     
 }
 
@@ -260,28 +316,27 @@
 
 
 }
+-(void)showUser{
+    [self.findUserArr enumerateObjectsUsingBlock:^(id  _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
+     UIImageView *img=obj;
+     [img setHidden:NO];
+ }];
 
--(void)setUserImgUrl:(NSDictionary *)dir{
-    NSMutableArray *handarr=[[NSMutableArray alloc]init];
-    
+}
+-(void)setUserImgUrl:(NSArray *)dir{
+
+    [_findUserArr removeAllObjects];
    NSArray *arr= [SearchView getFiveNum:5 max:10 min:1];
     
-//    for(int i=0;i<self.userArr.count;i++){
-//        for(int j=0;j<arr.count;j++){
-//          NSInteger b=  [arr[j] integerValue];
-//            if(b==i){
-//                
-//            
-//            }
-//        }
-//    }
     
     for(int i=0;i<arr.count;i++){
+        NSString *url=[dir[i] valueForKey:@"iconUrl"];
         
         UIImageView *img= [self.userArr objectAtIndex:[arr[i]integerValue]];
+        [_findUserArr addObject:img];
+        [img sd_setImageWithURL:[NSURL URLWithString:url] placeholderImage:[UIImage imageNamed:@"icon_mor"]];
         
-        img.image=[UIImage imageNamed:@"icon_nan"];
-        [img setHidden:NO];
+        [img setHidden:YES];
     }
     
     
@@ -290,7 +345,7 @@
 }
 
 //开始动画
--(void)startHh{
+-(void)startHh:(NSInteger)count dict:(CGFloat)dict{
 
     
     CABasicAnimation *ani=[[CABasicAnimation alloc]init];
@@ -298,9 +353,9 @@
     ani.toValue=[NSNumber numberWithFloat:1.5];
     ani.fromValue=[NSNumber numberWithFloat:0.8f];
 
-    ani.duration=1;
+    ani.duration=dict;
     ani.removedOnCompletion = NO;
-    ani.repeatCount=3;
+    ani.repeatCount=count;
     ani.fillMode = kCAFillModeForwards;
     ani.timingFunction = [CAMediaTimingFunction functionWithControlPoints:0.75 :0.75 :1.5 :1.5];
 
@@ -313,6 +368,9 @@
    
 }
 -(void)stopHh{
+    
+    [self hidenAllUserView];
+    
     
     [self.layer1 removeAllAnimations];
     [self.layer2 removeAllAnimations];

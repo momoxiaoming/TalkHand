@@ -22,7 +22,7 @@
 }
 
 -(void)setItemData:(NSDictionary *)itemdata type:(NSString *)fk{
-    
+    self.itemData=itemdata;
     if([fk isEqualToString:@"fk"]){
         self.name.text=itemdata[@"name"];
         [self.tx_img sd_setImageWithURL:[NSURL URLWithString:itemdata[@"iconUrl"]] placeholderImage:[UIImage imageNamed:@"icon_mor"]];
@@ -86,12 +86,35 @@
     
     
     
-    
+    [self setListener:self.gz_img index:1];
+    [self setListener:self.tx_img index:2];
    
     
     
     
 }
+
+
+-(void)setListener:(UIView *) arr index:(NSInteger) index{
+    
+    arr.tag=index;   //设置传递的参数
+    UITapGestureRecognizer *tableViewGesture = [[UITapGestureRecognizer alloc] initWithTarget:self action:@selector(menuAction:)];
+    //    tableViewGesture.view.tag=index;
+    arr.userInteractionEnabled=YES;
+    [arr addGestureRecognizer:tableViewGesture];
+    
+}
+
+
+-(void)menuAction:(id)sender{
+    UITapGestureRecognizer *tap = (UITapGestureRecognizer*)sender;
+    
+    UIView *views = (UIView*) tap.view;
+    
+    NSUInteger index = views.tag;   //获取上面view设置的tag
+     [_gzdelete cellClick:index isright:0 object:self.itemData];
+}
+
 
 //该方法用于创建cell
 +(instancetype)tgcellWithTableView:(UITableView *)tableview{

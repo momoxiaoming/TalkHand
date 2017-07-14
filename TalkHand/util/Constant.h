@@ -71,6 +71,8 @@
 
 #define getgz_url @"user/getFollower" //关注他人
 
+#define qxgz_url @"user/unfollowUser" //取消关注
+
 #define getfw_url @"user/getRecentVisitor" //获取访问
 
 #endif /* Header_h */

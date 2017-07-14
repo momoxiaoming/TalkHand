@@ -20,6 +20,8 @@
 #import "LeftCell.h"
 #import "RightCell.h"
 #import "XMNChatExpressionManager.h"
+#import "Voice.h"
+#import "FMDConfig.h"
 
 @interface ChatViewController ()
 @property  UITableView *table_view;
@@ -31,14 +33,32 @@
 
 @property  NSString *filePath;
 
+@property NSInteger isvis;
 @end
 
 @implementation ChatViewController
 
 - (void)viewDidLoad {
     [super viewDidLoad];
+    NSString *userid=[[NSUserDefaults standardUserDefaults]valueForKey:@"id"];
+    
+    FMDConfig *config=[FMDConfig sharedInstance];
+    NSDictionary *dir= [config getUserInfoWithId:userid];
+    
+    _isvis=[[dir valueForKey:@"isVip" ] integerValue];
+    
     [self initView];
-    self.navigationController.navigationBar.alpha=1;
+//    self.navigationController.navigationBar.alpha=1;
+    
+    [self initUserInfo];
+    [self initData];
+    
+    //    [self scrollBottom:YES];
+    
+    /** 首次出现让tableView滚动到底部 */
+    [self.table_view reloadData];
+    [self.table_view setContentOffset:CGPointMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+    
     
     self.inoutType=false;
     
@@ -57,15 +77,33 @@
     
     //  给keyBoardlsVisible赋初值
     _keyBoardlsVisible = NO;
+    [[UIDevice currentDevice] setProximityMonitoringEnabled:YES];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(sensorStateChange:)name:UIDeviceProximityStateDidChangeNotification object:nil];
+      [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    
+    
 }
-
+-(void)sensorStateChange:(id)sender{
+    if ([[UIDevice currentDevice] proximityState] == YES) {
+        //靠近耳朵
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayAndRecord error:nil];
+    } else {
+        //离开耳朵
+        [[AVAudioSession sharedInstance] setCategory:AVAudioSessionCategoryPlayback error:nil];
+    }
+    
+}
 -(void)send_face_action{
     NSString *inoutstr=self.bot_view.input_text.text;
     if(![inoutstr isEqualToString:@""]){
     //        [self sendMsg:inouttext];
-    [self sendManager:0 second:0 content:inoutstr];
+    [self sendManager:0 second:0 content:inoutstr voiceurl:@""];
     }
 }
+
+
+
+
 
 
 //  键盘弹出触发该方法
@@ -80,6 +118,9 @@
     NSLog(@"键盘隐藏");
     _keyBoardlsVisible =NO;
 }
+
+
+
 /**
  *  处理键盘frame改变通知
  *
@@ -112,17 +153,13 @@
 
 -(void)viewWillAppear:(BOOL)animated{
     self.navigationController.navigationBar.alpha=1;
-    [self initUserInfo];
-    [self initData];
-    
-//    [self scrollBottom:YES];
-    
-    /** 首次出现让tableView滚动到底部 */
-    [self.table_view reloadData];
-    [self.table_view setContentOffset:CGPointMake(CGFLOAT_MAX, CGFLOAT_MAX)];
+   
 }
 
-
+-(void)viewWillDisappear:(BOOL)animated{
+    [[Voice sharedInstance]Stop];
+   
+}
 
 
 //键盘弹出时,更新约束
@@ -346,12 +383,8 @@
         [self showKeyBordy];
         
     }else if(index==101){  //松开操作
-        
-
         [self stopRecord:1];
-        
-  
-
+    
     }else if(index==102){  //按下操作
    
      [self startRecord];
@@ -403,6 +436,16 @@
 - (void)startRecord {
     NSLog(@"开始录音");
      [XMNChatRecordProgressHUD show];
+
+    NSString *path = NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES).firstObject;
+    
+    NSString *filename=[Util getCurrentTimestamp];
+    
+    NSString *voice_path=[NSString stringWithFormat:@"%@/%@.wav",path,filename];
+    
+
+    [[Voice sharedInstance] Start:voice_path];
+    
     //录制amr格式语音
 //    [self.recorder setEncoderType:XMNAudioEncoderTypeAMR];
 //    [self.recorder startRecording];
@@ -413,25 +456,41 @@
 - (void)stopRecord:(NSInteger)index {
 
     if(index==1){
+        [XMNChatRecordProgressHUD dismissWithMessage:@"录音完成"];
+        NSString *path= [[Voice sharedInstance] Stop];
         
-//        if (self.recorder.isRecording) {
-//            [self.recorder stopRecording];
-//             [XMNChatRecordProgressHUD dismissWithMessage:@"录音完成"];
-//     
-//            CGFloat time=self.recorder.seconds;
-//          
-//            NSString* url=[[self.recorder filePath] stringByAppendingPathComponent:[self.recorder filename]];
-//            
-//            
-//            
-////            NSLog(@"录音成功--文件名=%@,文件地址=%@,录音时间=%f",name,path_URL,time);
-//            
-//            if(url){
-//                [self upAudioLoadFile:url time:time];
-//            }
-//           
-//            return;
-//        }
+        
+        
+        CGFloat time=[[Voice sharedInstance]GetIntervalTimeForString];
+       
+        //转为amr格式
+        NSString *arm_url=[path substringToIndex:path.length-3];
+        arm_url=  [arm_url stringByAppendingString:@"amr"];
+        
+        if(time>30){ //录音时间过长
+            [[Toast makeText:@"录音时间过长"] showWithType:ShortTime];
+            
+            return;
+        }
+        
+        
+        int i=  [[Voice sharedInstance]WAV2AMR:path amr:arm_url];
+
+        if(i==1){  //格式转换成功,并且在本地保存wav的录音地址,便于本地读取
+            
+//            NSFileManager *man=[[NSFileManager alloc]init];
+            
+            [self upAudioLoadFile:arm_url time:time lcVioceUrl:path armUrl:arm_url];
+            
+        }else{  //录音失败,删除原有wav文件
+            [Util deleteDistoryFile:path];
+             [[Toast makeText:@"录音错误,请重试!"] showWithType:ShortTime];
+        }
+        
+        
+        
+        return;
+        
     }else if(index==2){
         [XMNChatRecordProgressHUD dismissWithMessage:@"录音取消"];
     }
@@ -475,116 +534,9 @@
 }
 
 
-//-(CGFloat)tableView:(UITableView *)tableView heightForRowAtIndexPath:(NSIndexPath *)indexPath{
-//    BaseMsg* en=[self.msgarray objectAtIndex:indexPath.row];
-//    int type=[[en valueForKeyPath:@"msg_info_type"]intValue];;
-//    
-//    if(type==[textMsg intValue]){
-//           NSString * constr=[en valueForKeyPath:@"msg_content"];
-//        //设置文本内容,先转为富文本
-//        NSMutableAttributedString *one = [[NSMutableAttributedString alloc] initWithString:constr];
-////        //解析富文本
-////        [self.msg_text.textParser parseText:one
-////                              selectedRange:NULL];
-//        //设置富文本的字体大小
-//        one.yy_font =[UIFont systemFontOfSize:14];
-//        //定义一个富文本边界
-//        YYTextContainer *container = [YYTextContainer containerWithSize:CGSizeMake(SCREEN_WIDTH - 150, CGFLOAT_MAX)];
-//        //设置textView 固定行高
-//        YYTextLinePositionSimpleModifier *mod = [YYTextLinePositionSimpleModifier new];
-//        mod.fixedLineHeight = 26;
-////        self.msg_text.linePositionModifier = mod;
-//        container.linePositionModifier =mod;
-//        //定义一个layoutview
-//        YYTextLayout *layout = [YYTextLayout layoutWithContainer:container text:one];
-////        self.msg_text.textLayout = layout;
-//        
-//        CGSize titleSize  = CGSizeMake(MIN(MIN(layout.textBoundingSize.width , SCREEN_WIDTH - 150), layout.textBoundingSize.width ), layout.rowCount * 26 );
-//   
-////        CGSize titleSize = [constr boundingRectWithSize:CGSizeMake(SCREEN_WIDTH-150, MAXFLOAT) options:NSStringDrawingUsesLineFragmentOrigin attributes:@{NSFontAttributeName:[UIFont systemFontOfSize:16]} context:nil].size;
-//        if((titleSize.height+20)>45){
-//            if(layout.rowCount==1){
-//                return 65;
-//            }
-//            return 20+titleSize.height+20;
-//        }
-//        
-//        return 45+20;
-//    }else if(type==[aduioMsg intValue]){
-//        
-//        return 45+20;
-//        
-//        
-//    }else if(type==[picterMsg intValue]){
-//        
-//        return 250+20;
-//        
-//        
-//    }else if(type==[videoMsg intValue]){
-//        
-//        return 250+20;
-//        
-//    }
-//    return 0;
-//}
+
 
 - (UITableViewCell *)tableView:(UITableView *)tableView cellForRowAtIndexPath:(NSIndexPath *)indexPath {
-    //    ChatMsgCell *cell = [tableView cellForRowAtIndexPath:indexPath];
-    
-//    BaseMsg* en=[self.msgarray objectAtIndex:indexPath.row];
-//    int type=[[en valueForKeyPath:@"msg_info_type"]intValue];;
-//    
-//    if(type==[textMsg intValue]){
-//        
-//        ChatMsgCell *cell = [tableView dequeueReusableCellWithIdentifier:@"chatmsgcell"] ;
-//        
-//        if(cell){
-//            
-//            cell=[[ChatMsgCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"chatmsgcell"];
-//        }
-//        cell.msgdelete=self;
-//        [cell setCellMsg:en];
-//        //         cell.userInteractionEnabled = NO;
-//        return cell;
-//    }else if(type==[aduioMsg intValue]){ //语音
-//        ChatAudioCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatAudioCell"] ;
-//        
-//        if(cell){
-//            
-//            cell=[[ChatAudioCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ChatAudioCell"];
-//        }
-//        [cell setCellMsg:nil];
-//        //        cell.userInteractionEnabled = NO;
-//        return cell;
-//        
-//    }else if(type==[picterMsg intValue]){ //图片
-//        ChatImageMsgCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatImageMsgCell"] ;
-//        
-//        if(cell){
-//            
-//            cell=[[ChatImageMsgCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ChatImageMsgCell"];
-//        }
-//        
-//        
-//        [cell setCellMsg:en ViewController:self];
-//        //         cell.userInteractionEnabled = NO;
-//        return cell;
-//        
-//        
-//        
-//    }else if(type==[videoMsg intValue]){ //视频
-//        ChatVideoCell *cell = [tableView dequeueReusableCellWithIdentifier:@"ChatVideoCell"] ;
-//        
-//        if(cell){
-//            
-//            cell=[[ChatVideoCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"ChatVideoCell"];
-//        }
-//        cell.celldelete=self;
-//        [cell setCellMsg:en];
-//        //        cell.userInteractionEnabled = NO;
-//        return cell;
-//        
-//    }
     
     
     BaseMsg* en=[self.msgarray objectAtIndex:indexPath.row];
@@ -598,8 +550,7 @@
             
             cell=[[RightCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"RightCell"];
         }
-//        cell.msgdelete=self;
-//        [cell setCellMsg:en];
+
         cell.controller=self;
         [cell configMessage:en];
         cell.cellDelete=self;
@@ -611,8 +562,7 @@
             
             cell=[[LeftCell alloc]initWithStyle:UITableViewCellStyleSubtitle reuseIdentifier:@"LeftCell"];
         }
-        //        cell.msgdelete=self;
-        //        [cell setCellMsg:en];
+     
          cell.cellDelete=self;
         [cell configMessage:en];
         
@@ -665,7 +615,7 @@
             
         }else{
             //        [self sendMsg:inouttext];
-            [self sendManager:0 second:0 content:inoutstr];
+            [self sendManager:0 second:0 content:inoutstr voiceurl:@""];
             
         }
         
@@ -681,79 +631,75 @@
 
 
 //消息发送管理器
--(void)sendManager:(NSInteger) type second:(NSInteger)mindex content:(NSString*)contnet{
-    
+-(void)sendManager:(NSInteger) type second:(NSInteger)mindex content:(NSString*)contnet voiceurl:(NSString *)voiceUrl{
+   
     [MBProgressHUD hideHUDForView:self.view animated:YES];
     
-    BaseMsg * msg=[[BaseMsg alloc]init];
-    msg.msg_info_type=[NSString stringWithFormat:@"%lu",type];
-    msg.msg_content=contnet;
-    msg.msg_time=[Util get1970Time];
-    msg.msg_second=[NSString stringWithFormat:@"%lu",mindex];
-    msg.msg_isor=@"0";
-    msg.otherid=self.account;
-    msg.isread=@"1";
-    //保存消息
-    [[FMDConfig sharedInstance]saveMessageWithOtherId:msg];
+  
     
-    [self.msgarray addObject:msg];
+  
     
-    NSLog(@"发送消息--小写内容-%@",msg);
+    if(_isvis==1){
+        BaseMsg * msg=[[BaseMsg alloc]init];
+        msg.msg_info_type=[NSString stringWithFormat:@"%lu",type];
+        msg.msg_content=contnet;
+        msg.msg_time=[Util get1970Time];
+        msg.msg_second=[NSString stringWithFormat:@"%lu",mindex];
+        msg.msg_isor=@"0";
+        msg.otherid=self.account;
+        msg.isread=@"1";
+        msg.lc_voiceUrl=voiceUrl;
+        //保存消息
+        [[FMDConfig sharedInstance]saveMessageWithOtherId:msg];
+        
+        [self.msgarray addObject:msg];
+        
+        NSLog(@"发送消息--小写内容-%@",msg);
+        
+        //刷新列表数据
+        [_table_view reloadData];
+        
+        self.bot_view.input_text.text=@"";
+        
+        [self scrollBottom:YES];
+        
+        //发送消息
+        NSMutableDictionary *dir=[[NSMutableDictionary alloc]init];
+        [dir setObject:[NSString stringWithFormat:@"%lu",type] forKey:@"type"];
+        [dir setObject:contnet forKey:@"content"];
+        [dir setObject:[NSString stringWithFormat:@"%lu",mindex] forKey:@"second"];
+        [[LocalUDPDataSender sharedInstance] sendCommonDataWithStr:[dir mj_JSONString] toUserId:[self.account intValue] qos:YES fp:nil];
+
+    }else{
+        
+        [self closeKeyBordy];
+        
+        UIAlertController * alert=[UIAlertController alertControllerWithTitle:@"提示" message:@"开通会员即可和好友有畅聊,是否开通会员?" preferredStyle:UIAlertControllerStyleAlert];
+        UIAlertAction *qx=[UIAlertAction actionWithTitle:@"取消" style:UIAlertActionStyleCancel handler:^(UIAlertAction * _Nonnull action) {
+            
+        }];
+        UIAlertAction *qd=[UIAlertAction actionWithTitle:@"确定" style:UIAlertActionStyleDestructive handler:^(UIAlertAction * _Nonnull action) {
+            VIPViewController *vip=[[VIPViewController alloc]init];
+            [self goNextController:vip];
+        }];
+        
+        [alert addAction:qx];
+        [alert addAction:qd];
+        [self presentViewController:alert animated:YES completion:nil];
+    }
+
     
-    //刷新列表数据
-    [_table_view reloadData];
     
-    self.bot_view.input_text.text=@"";
     
-    [self scrollBottom:YES];
     
-    //发送消息
-    NSMutableDictionary *dir=[[NSMutableDictionary alloc]init];
-    [dir setObject:[NSString stringWithFormat:@"%lu",type] forKey:@"type"];
-    [dir setObject:contnet forKey:@"content"];
-    [dir setObject:[NSString stringWithFormat:@"%lu",mindex] forKey:@"second"];
-    [[LocalUDPDataSender sharedInstance] sendCommonDataWithStr:[dir mj_JSONString] toUserId:[self.account intValue] qos:YES fp:nil];
+    
     
     
     
     
     
 }
-////发送图片消息
-//-(NSString*)sendPickerMsg:(NSString*)str{
-//    BaseMsg * msg=[[BaseMsg alloc]init];
-//    msg.msg_info_type=textMsg;
-//    msg.msg_content=str;
-//    msg.msg_time=[Util get1970Time];
-//    msg.msg_second=@"0";
-//    msg.msg_isor=@"0";
-//    msg.otherid=self.account;
-//    msg.isread=@"1";
-//    //保存消息
-//    [[FMDConfig sharedInstance]saveMessageWithOtherId:msg];
-//
-//    [self.msgarray addObject:msg];
-//
-//    //刷新列表数据
-//    [_table_view reloadData];
-//
-//    self.bot_view.input_text.text=@"";
-//
-//    [self scrollBottom:NO];
-//
-//    return str;
-//}
 
-////滚动到底部
-//- (void)scrollBottom:(BOOL)animated {
-//    
-//    if (self.msgarray.count >= 1) {
-//        [self.table_view scrollToRowAtIndexPath:[NSIndexPath indexPathForRow:MAX(0, self.msgarray.count - 1) inSection:0] atScrollPosition:UITableViewScrollPositionBottom animated:animated];
-//    }
-//    
-//    
-//    
-//}
 
 #pragma mark  - 滑到最底部
 -(void)scrollBottom:(BOOL)animated
@@ -942,11 +888,11 @@
             
             NSString * video_url=[ url_list valueForKey:@"1"];
             NSLog(@"图片地址%@",video_url);
-            //            if(![video_url isEqualToString:@""]){
+                        if(![video_url isEqualToString:@""]){
             //发送图片信息
-            [self sendManager:2 second:0 content:video_url];
+            [self sendManager:2 second:0 content:video_url voiceurl:@""];
             
-            //            }
+                        }
             
             
             //            [self showWindow:@"2" url:video_url];
@@ -962,8 +908,8 @@
     }];
 }
 
--(void)upAudioLoadFile:(NSString *)url time:(CGFloat)time{
-      [MBProgressHUD showHUDAddedTo:self.view animated:YES];
+-(void)upAudioLoadFile:(NSString *)url time:(CGFloat)time lcVioceUrl:(NSString*)voiceurl armUrl:(NSString *)armUrl{
+    [MBProgressHUD showHUDAddedTo:self.view animated:YES];
     AFHttpSessionClient * af=[AFHttpSessionClient sharedClient ];
     
 //    [NSData dataWithContentsOfFile:url];
@@ -973,9 +919,11 @@
     NSMutableDictionary *dir=[[NSMutableDictionary alloc]init];
     
     [dir setObject:aduioMsg forKey:@"type"];
+    
+    
+    
     [af UploadAudioFile:video_data path:upvideo_url parameters:dir actionBlock:^(NSDictionary *posts, NSError *error) {
         NSLog(@"%@",posts);
-        
           [MBProgressHUD hideHUDForView:self.view animated:YES];
         if([posts[@"state"] isEqualToString:@"1"]){
             
@@ -985,8 +933,12 @@
             
             NSString * video_url=[ url_list valueForKey:@"1"];
             if(![video_url isEqualToString:@""]){
+               
+                //上传成功,删除原本arm文件,
+                [Util deleteDistoryFile:armUrl];
                 
-              [self sendManager:[aduioMsg integerValue] second:time content:video_url];
+              
+              [self sendManager:[aduioMsg integerValue] second:time content:video_url voiceurl:voiceurl];
                 
             }
             NSLog(@"语音地址%@",video_url);
@@ -1021,7 +973,7 @@
             NSString * video_url=[ url_list valueForKey:@"1"];
             if(![video_url isEqualToString:@""]){
                 //发送语音消息
-                [self sendManager:3 second:0 content:video_url];
+                [self sendManager:3 second:0 content:video_url voiceurl:@""];
                 
             }
             NSLog(@"视频地址%@",video_url);
@@ -1037,6 +989,11 @@
 }
 
 -(void)cellClick:(NSInteger)tag isright:(NSInteger)isright object:(NSObject *)obj{
+    
+   
+    
+    
+    
     if(isright==0){ //发送cell
         if(tag==2){
             AVPlayerViewController * pl=[[AVPlayerViewController alloc]init];
@@ -1044,27 +1001,6 @@
             [self goNextController:pl];
         }else if(tag==1){
             
-        }else if(tag==5){  //播放音频
-            NSString* audio_url=[obj valueForKey:@"msg_content"];
-            NSLog(@"音频地址=%@",audio_url);
-         
-            
-            
-            
-            
-            
-            
-            AFHttpSessionClient *cliend=  [AFHttpSessionClient sharedClient];
-            
-            [cliend downFilepath:audio_url parameters:nil actionBlock:^(NSDictionary *dict, NSError * error) {
-                [cliend downFilepath:audio_url parameters:nil actionBlock:^(NSDictionary *dict , NSError * error) {
-                    if (!error) {
-                        NSString * videoUrl=[dict valueForKey:@"filePath"];
-                        
-                      
-                    }
-                }];
-            }];
         }
     }else if(isright==1){//接收cell
         if(tag==2){  //点击视频
@@ -1075,24 +1011,78 @@
             NearyinfoViewController *con=[[NearyinfoViewController alloc]init];
             con.owerid=self.account;
             [self goNextController:con];
-        }else if(tag==5){//播放音频
-            NSString* audio_url=[obj valueForKey:@"msg_content"];
-            NSLog(@"音频地址=%@",audio_url);
-            
-            AFHttpSessionClient *cliend=  [AFHttpSessionClient sharedClient];
-            
-            [cliend downFilepath:audio_url parameters:nil actionBlock:^(NSDictionary *dict , NSError * error) {
-                if (!error) {
-                     NSString * videoUrl=[dict valueForKey:@"filePath"];
-                    
-                    
-                    
-                }
-            }];
         }
     }
     
-    
+    if(tag==5){
+        
+        
+     
+         NSString *lc_voiceUrl=  [obj valueForKey:@"lc_voiceUrl"];
+
+         NSLog(@"本地语音地址=%@",lc_voiceUrl);
+        
+        if(lc_voiceUrl!=nil&&![lc_voiceUrl isEqualToString:@""]){
+            //本地语音存在,直接播放
+            
+            NSFileManager *man=[[NSFileManager alloc]init];
+           bool ex=   [man fileExistsAtPath:lc_voiceUrl];
+            NSLog(@"语音是否存在-->%i",ex);
+            
+            
+            [[Voice sharedInstance]Play:lc_voiceUrl];
+        
+        }else{ //本地消息,不存在,下载后转格式播放
+            
+        NSString* audio_url=[obj valueForKey:@"msg_content"];
+            if(audio_url!=NULL){
+            AFHttpSessionClient *cliend=  [AFHttpSessionClient sharedClient];
+            
+            [cliend downFilepath:audio_url parameters:nil actionBlock:^(NSDictionary *dict, NSError * error) {
+                [cliend downFilepath:audio_url parameters:nil actionBlock:^(NSDictionary *dict , NSError * error) {
+                    if (!error) {
+                        NSString * videoUrl=[[dict valueForKey:@"filePath"] absoluteString];
+//                   
+                          videoUrl=[videoUrl substringFromIndex:6];
+                        //下载完毕,转换格式
+                        NSString *wav_path=[[videoUrl substringToIndex:videoUrl.length-3] stringByAppendingString:@"wav"];
+                        NSData *dd=[NSData dataWithContentsOfFile:videoUrl];
+                        
+                        NSLog(@"arm文件大小-->%lu",dd.length);
+                        
+                        
+                        
+                       int isyes= [[Voice sharedInstance] AMR2WAV:videoUrl wav:wav_path];
+                        if(isyes==1){ //转换成功,更新消息,删除arm文件,减小空间
+                            BaseMsg *msg=(BaseMsg*)obj;
+                            msg.lc_voiceUrl=wav_path;
+                            
+                             NSLog(@"保存的本地本地语音地址=%@",wav_path);
+                            
+                            [[FMDConfig sharedInstance]updateMessage:msg];
+                           
+                            [[Voice sharedInstance] Play:wav_path];
+                             [Util deleteDistoryFile:videoUrl];
+                            
+                            
+                        }else{
+                            [Util deleteDistoryFile:wav_path];
+                        
+                        }
+                        
+                       
+                        
+                    }
+                }];
+             }];
+            }
+        }
+        
+       
+        
+        
+        
+    }
 
 }
 

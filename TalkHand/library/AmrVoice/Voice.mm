@@ -29,6 +29,8 @@ static Voice *instance = nil;
 {
     
     
+    self.recv_path=file;
+    
     
     NSURL *fileUri = [NSURL fileURLWithPath: file];
     NSError *error = nil;
@@ -76,7 +78,7 @@ static Voice *instance = nil;
 }
 
 
-- (void)Stop
+- (NSString *)Stop
 {
     if (_recorder && _recorder.isRecording)
     {
@@ -91,6 +93,14 @@ static Voice *instance = nil;
     }
     
     _endTime=[self GetCurrentTimeForString];
+    
+    NSData *data=[NSData dataWithContentsOfFile:self.recv_path];
+    
+     //将文件从运行内容保存到成文件
+     [data writeToFile:self.recv_path atomically:YES];
+    
+    
+    return self.recv_path;
 }
 
 - (int)Play:(NSString *)file
@@ -100,7 +110,7 @@ static Voice *instance = nil;
     _player = [[AVAudioPlayer alloc] initWithContentsOfURL: fileUri error:&error];
     
     
-    //启接近监视(靠近耳朵的时候听筒播放,离开的时候扬声器播放)
+ 
    
     if (error)
     {

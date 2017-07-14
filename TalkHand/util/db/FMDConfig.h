@@ -41,7 +41,8 @@
 //根据id获取所有聊天信息
 -(NSMutableArray<BaseMsg * > *)getAllMsgWithOtherId:(NSString *)otherid;
 
-
+//根据消息id更新消息的本地语音地址
+-(void)updateMessage:(BaseMsg *)basemsg;
 
 
 @end
