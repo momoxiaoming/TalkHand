@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PipViewController">
+            <connections>
+                <outlet property="btn" destination="Yai-jL-3el" id="XdJ-MF-Gxs"/>
+                <outlet property="left_img" destination="ixT-c2-Mql" id="KWZ-IE-F48"/>
+                <outlet property="right_img" destination="EDM-bu-uAu" id="UZf-Gj-UyF"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleToFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_content" translatesAutoresizingMaskIntoConstraints="NO" id="Km5-ko-KI4">
+                    <rect key="frame" x="-1" y="0.0" width="376" height="667"/>
+                </imageView>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_nan" translatesAutoresizingMaskIntoConstraints="NO" id="ixT-c2-Mql">
+                    <rect key="frame" x="70" y="273" width="120" height="120"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="120" id="6Er-O1-Ine"/>
+                        <constraint firstAttribute="height" constant="120" id="Bo9-3q-bZX"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksTobounds" value="YES"/>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="60"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </imageView>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" image="icon_nan" translatesAutoresizingMaskIntoConstraints="NO" id="EDM-bu-uAu">
+                    <rect key="frame" x="185" y="273" width="120" height="120"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="120" id="anK-DY-D7Z"/>
+                    </constraints>
+                    <userDefinedRuntimeAttributes>
+                        <userDefinedRuntimeAttribute type="boolean" keyPath="layer.masksTobounds" value="YES"/>
+                        <userDefinedRuntimeAttribute type="number" keyPath="layer.cornerRadius">
+                            <integer key="value" value="60"/>
+                        </userDefinedRuntimeAttribute>
+                    </userDefinedRuntimeAttributes>
+                </imageView>
+                <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="匹配成功,正在连接对方....." textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="4h2-Xg-afp">
+                    <rect key="frame" x="103" y="443" width="168" height="21"/>
+                    <constraints>
+                        <constraint firstAttribute="height" constant="21" id="6yK-ps-xfj"/>
+                        <constraint firstAttribute="width" constant="168" id="I7M-If-exB"/>
+                    </constraints>
+                    <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                    <color key="textColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    <nil key="highlightedColor"/>
+                </label>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Yai-jL-3el">
+                    <rect key="frame" x="121" y="494" width="133" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="133" id="0NS-Hf-6Vb"/>
+                        <constraint firstAttribute="height" constant="40" id="Azk-L4-67V"/>
+                    </constraints>
+                    <state key="normal" title="取消连接">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstAttribute="bottom" secondItem="Km5-ko-KI4" secondAttribute="bottom" id="9xt-VA-gt9"/>
+                <constraint firstItem="Yai-jL-3el" firstAttribute="top" secondItem="4h2-Xg-afp" secondAttribute="bottom" constant="30" id="ED5-XJ-fkc"/>
+                <constraint firstItem="EDM-bu-uAu" firstAttribute="bottom" secondItem="ixT-c2-Mql" secondAttribute="bottom" id="FyY-hN-BMo"/>
+                <constraint firstItem="4h2-Xg-afp" firstAttribute="top" secondItem="ixT-c2-Mql" secondAttribute="bottom" constant="50" id="Hif-66-SCk"/>
+                <constraint firstItem="Km5-ko-KI4" firstAttribute="centerX" secondItem="i5M-Pr-FkT" secondAttribute="centerX" id="IyC-Xw-byY"/>
+                <constraint firstItem="ixT-c2-Mql" firstAttribute="centerY" secondItem="Km5-ko-KI4" secondAttribute="centerY" id="Pm7-Is-ZuB"/>
+                <constraint firstItem="ixT-c2-Mql" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="70" id="YyW-bJ-0ym"/>
+                <constraint firstItem="4h2-Xg-afp" firstAttribute="centerX" secondItem="Km5-ko-KI4" secondAttribute="centerX" id="aTb-gp-4Kf"/>
+                <constraint firstAttribute="trailing" secondItem="Km5-ko-KI4" secondAttribute="trailing" id="atu-Br-xTx"/>
+                <constraint firstAttribute="trailing" secondItem="EDM-bu-uAu" secondAttribute="trailing" constant="70" id="kIX-oR-68s"/>
+                <constraint firstItem="Yai-jL-3el" firstAttribute="centerX" secondItem="4h2-Xg-afp" secondAttribute="centerX" id="mOo-Em-f2n"/>
+                <constraint firstItem="Km5-ko-KI4" firstAttribute="top" secondItem="i5M-Pr-FkT" secondAttribute="top" id="oKv-AZ-QyB"/>
+                <constraint firstItem="EDM-bu-uAu" firstAttribute="top" secondItem="ixT-c2-Mql" secondAttribute="top" id="vZ2-f9-Cvf"/>
+            </constraints>
+            <point key="canvasLocation" x="25.5" y="51.5"/>
+        </view>
+    </objects>
+    <resources>
+        <image name="icon_content" width="360" height="515"/>
+        <image name="icon_nan" width="66" height="66"/>
+    </resources>
+</document>

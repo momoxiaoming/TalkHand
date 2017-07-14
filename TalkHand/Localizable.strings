@@ -1,0 +1,48 @@
+/* 
+  Localizable.strings
+  QsQ
+
+  Created by 张小明 on 2017/3/24.
+  Copyright © 2017年 张小明. All rights reserved.
+*/
+"neary"="附近";
+
+
+
+//我的页面
+"user_center_item1_str"="认证信息";
+"user_center_item2_str"="我的打赏";
+"user_center_item3_str"="会员中心";
+"user_center_item4_str"="我要赚钱";
+"user_center_item5_str"="我的设置";
+
+//认证信息
+"rzxx_str1"="请上传手持身份证,等待后台审核通过";
+"rzxx_str2"="视频必须是1~10秒,大小不超过5M";
+"rzxx_str3"="保存";
+
+//我要赚钱
+"wyzq_str"="开通高级赚钱会员每天有更多广告点击机会,能每天赚取15元钱,并送1098天视频会员.";
+"wyzq_str2"="点击下面广告赚取广告费";
+
+//我的设置
+"set_str"="消息推送";
+"set_str2"="修改密码";
+"set_str3"="检查更新";
+"set_str4"="关于我们";
+
+
+//我的打赏
+"wdds_tx_t1"="账户余额:";
+"wdds_tx_t2"="体现金额:";
+"wdds_tx_t3"="说明";
+"wdds_tx_t4"="1.金额必须满100块钱才可以体现,体现只能是100的整数倍";
+"wdds_tx_t5"="2.提现必须是实名认证和视频认证通过用户";
+"wdds_tx_t6"="3.必须连续在线登陆30天才能提现";
+
+
+"user_tab_item1_str"="相册";
+"user_tab_item2_str"="视频";
+
+
+"msg_top_item_text"="最近访客";

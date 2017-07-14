@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="12118" systemVersion="16E195" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" colorMatched="YES">
+    <device id="retina4_7" orientation="portrait">
+        <adaptation id="fullscreen"/>
+    </device>
+    <dependencies>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="12086"/>
+        <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
+    </dependencies>
+    <objects>
+        <placeholder placeholderIdentifier="IBFilesOwner" id="-1" userLabel="File's Owner" customClass="PhoneViewController">
+            <connections>
+                <outlet property="bg_img" destination="a4b-sm-FKu" id="xR5-jG-zWD"/>
+                <outlet property="jt_btn" destination="g5v-xS-04t" id="UKy-Fr-Vh2"/>
+                <outlet property="qx_btn" destination="GGk-gO-eAc" id="ZFM-QT-wFf"/>
+                <outlet property="view" destination="i5M-Pr-FkT" id="sfx-zR-JGt"/>
+            </connections>
+        </placeholder>
+        <placeholder placeholderIdentifier="IBFirstResponder" id="-2" customClass="UIResponder"/>
+        <view clearsContextBeforeDrawing="NO" contentMode="scaleToFill" id="i5M-Pr-FkT">
+            <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+            <subviews>
+                <imageView userInteractionEnabled="NO" contentMode="scaleAspectFill" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="a4b-sm-FKu">
+                    <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                    <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                </imageView>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="GGk-gO-eAc">
+                    <rect key="frame" x="20" y="577" width="133" height="40"/>
+                    <constraints>
+                        <constraint firstAttribute="width" constant="133" id="Lap-I0-ZOV"/>
+                        <constraint firstAttribute="height" constant="40" id="Q9T-ji-hTY"/>
+                    </constraints>
+                    <state key="normal" title="挂机">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                    </state>
+                    <connections>
+                        <action selector="qx_aciton:" destination="-1" eventType="touchUpInside" id="Zdo-yj-yns"/>
+                    </connections>
+                </button>
+                <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="roundedRect" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="g5v-xS-04t">
+                    <rect key="frame" x="222" y="577" width="133" height="40"/>
+                    <state key="normal" title="接听">
+                        <color key="titleColor" red="1" green="1" blue="1" alpha="1" colorSpace="calibratedRGB"/>
+                        <color key="titleShadowColor" red="0.10829411019387168" green="0.28330376764912518" blue="0.91882138324873097" alpha="0.056292808219178085" colorSpace="custom" customColorSpace="displayP3"/>
+                    </state>
+                    <connections>
+                        <action selector="jt_aciton:" destination="-1" eventType="touchUpInside" id="keb-zq-ANo"/>
+                    </connections>
+                </button>
+            </subviews>
+            <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <constraints>
+                <constraint firstItem="g5v-xS-04t" firstAttribute="width" secondItem="GGk-gO-eAc" secondAttribute="width" id="15F-uH-iyk"/>
+                <constraint firstItem="g5v-xS-04t" firstAttribute="baseline" secondItem="GGk-gO-eAc" secondAttribute="baseline" id="BDn-mY-Wrk"/>
+                <constraint firstAttribute="bottom" secondItem="GGk-gO-eAc" secondAttribute="bottom" constant="50" id="EFn-b7-3Mm"/>
+                <constraint firstItem="GGk-gO-eAc" firstAttribute="leading" secondItem="i5M-Pr-FkT" secondAttribute="leading" constant="20" id="SMW-TM-Uc1"/>
+                <constraint firstItem="g5v-xS-04t" firstAttribute="height" secondItem="GGk-gO-eAc" secondAttribute="height" id="ZOH-lC-TFt"/>
+                <constraint firstAttribute="trailing" secondItem="g5v-xS-04t" secondAttribute="trailing" constant="20" id="ePy-Cb-Ilb"/>
+            </constraints>
+            <point key="canvasLocation" x="25.5" y="51.5"/>
+        </view>
+    </objects>
+</document>

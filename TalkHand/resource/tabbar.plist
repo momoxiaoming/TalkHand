@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<array>
+	<dict>
+		<key>VcTitle</key>
+		<string>附近</string>
+		<key>SelectImgName</key>
+		<string>icon_fj_bl</string>
+		<key>ImgName</key>
+		<string>icon_fj</string>
+		<key>VcName</key>
+		<string>NearyViewController</string>
+	</dict>
+	<dict>
+		<key>VcTitle</key>
+		<string>视频</string>
+		<key>SelectImgName</key>
+		<string>icon_shp_bl</string>
+		<key>ImgName</key>
+		<string>icon_shp</string>
+		<key>VcName</key>
+		<string>VideoViewController</string>
+	</dict>
+	<dict>
+		<key>VcTitle</key>
+		<string>消息</string>
+		<key>SelectImgName</key>
+		<string>icon_news_bl</string>
+		<key>ImgName</key>
+		<string>icon_news</string>
+		<key>VcName</key>
+		<string>MsgViewController</string>
+	</dict>
+	<dict>
+		<key>VcTitle</key>
+		<string>我的</string>
+		<key>SelectImgName</key>
+		<string>icon_my_bl</string>
+		<key>ImgName</key>
+		<string>icon_my</string>
+		<key>VcName</key>
+		<string>HeaderTabViewController</string>
+	</dict>
+</array>
+</plist>
